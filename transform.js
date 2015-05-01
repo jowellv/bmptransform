@@ -17,9 +17,9 @@ function readBmp (filename) {
 
   var pixelStart = +file.readUInt32LE(10).toString(10);
 
-  bmpFile.px1 = file.readUInt8(pixelStart).toString(16);
-  bmpFile.px2 = file.readUInt8(pixelStart+1).toString(16);
-  bmpFile.px3 = file.readUInt8(pixelStart+2).toString(16);
+  bmpFile.px1 = file.readUInt8(pixelStart+8).toString(16);
+  bmpFile.px2 = file.readUInt8(pixelStart+8+1).toString(16);
+  bmpFile.px3 = file.readUInt8(pixelStart+8+2).toString(16);
   console.log('pixstart: ' + pixelStart);
   console.log('R: ' + bmpFile.px1);
   console.log('G: ' + bmpFile.px2);
