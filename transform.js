@@ -3,7 +3,7 @@
 var fs = require('fs');
 var img = './tru256.bmp';
 var img2 = './tweety78.bmp';
-
+var pixels = [];
 
 function readBmp (filename) {
   var file = fs.readFileSync(filename);
@@ -28,10 +28,6 @@ function readBmp (filename) {
   console.log("fileLength: " + file.length);
   console.log("width: " + bmpFile.width);
   console.log("height: " + bmpFile.height);
-
-  bmpFile.px1 = file.readUInt8(pixelStart+8).toString(16);
-  bmpFile.px2 = file.readUInt8(pixelStart+8+1).toString(16);
-  bmpFile.px3 = file.readUInt8(pixelStart+8+2).toString(16);
 
   console.log('pixstart: ' + pixelStart);
   console.log('colorIndex: ' + bmpFile.px1);
