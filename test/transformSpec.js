@@ -5,6 +5,7 @@ var transform = require('../transform');
 describe('transforms bmp files', function(){
 
   it('read file header 424d', function() {
+
     expect(transform.readBmp('./bitmap1.bmp').header).to.eql('424d');
   });
   it('read file size 11078', function() {
