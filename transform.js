@@ -29,6 +29,34 @@ function readBmp (filename) {
   return bmpFile;
 }
 
+
+function readBmp24 (filename) {
+  var file = fs.readFileSync(filename);
+  var bmpFile = {};
+
+  // header is 14 bytes long
+  bmpFile.header = file.readUInt16BE(0).toString(16);
+  bmpFile.fileSize = file.readUInt32LE(2);
+  bmpFile.width = file.readUInt32LE(18);
+  bmpFile.height = file.readUInt32LE(22);
+  bmpFile.bpp = file.readUInt32LE(28);
+
+  var pixelStart = +file.readUInt32LE(10);
+
+  // console.log("bpp: " + bmpFile.bpp);
+  // console.log("pixelStart : " + pixelStart);
+  // console.log("fileLength: " + file.length);
+  // console.log("width: " + bmpFile.width);
+  // console.log("height: " + bmpFile.height);
+
+  var pixels = [];
+  for(var i = 0; i < 50; i++) {
+    pixels[i] = file.readUInt8(54+i*3);
+  }
+  // console.log(pixels);
+  return bmpFile;
+}
+
 function transformBmp (fileObject) {
   fileObject.colorPal.forEach(function(colorRow, i, arr) {
     arr[i] = 16777215 - colorRow;
@@ -49,9 +77,9 @@ function writeBmp (fileObject, filename) {
   return outFile.readUInt16BE(0).toString(16);
 }
 
-
 module.exports = {
   readBmp: readBmp,
+  readBmp24: readBmp24,
   transformBmp: transformBmp,
   writeBmp: writeBmp
 };
