@@ -1,9 +1,6 @@
 'use strict';
 
 var fs = require('fs');
-var img = './tru256.bmp';
-var img2 = './tweety78.bmp';
-var pixels = [];
 
 function readBmp (filename) {
   var file = fs.readFileSync(filename);
@@ -31,6 +28,7 @@ function readBmp (filename) {
 
   console.log('pixstart: ' + pixelStart);
   console.log('colorIndex: ' + bmpFile.px1);
+
   // bmpFile.colorTable = [];
   // for(var i = pixelStart; i <= file.length; i++) {
   //   bmpFile.colorTable.push(255 -file.readUInt8(i));
@@ -40,12 +38,39 @@ function readBmp (filename) {
   return bmpFile;
 }
 
+function readBmp24 (filename) {
+  var file = fs.readFileSync(filename);
+  var bmpFile = {};
+
+  // header is 14 bytes long
+  bmpFile.header = file.readUInt16BE(0).toString(16);
+  bmpFile.fileSize = file.readUInt32LE(2);
+  bmpFile.width = file.readUInt32LE(18);
+  bmpFile.height = file.readUInt32LE(22);
+  bmpFile.bpp = file.readUInt32LE(28);
+
+  var pixelStart = +file.readUInt32LE(10);
+
+  console.log("bpp: " + bmpFile.bpp);
+  console.log("pixelStart : " + pixelStart);
+  console.log("fileLength: " + file.length);
+  console.log("width: " + bmpFile.width);
+  console.log("height: " + bmpFile.height);
+
+  var pixels = [];
+  for(var i = 0; i < 50; i++) {
+    pixels[i] = file.readUInt8(54+i*3);
+  }
+  console.log(pixels);
+  return bmpFile;
+}
+
 function processBmp (fileObject) {
   // body...
 }
 
 
-
 module.exports = {
-  readBmp: readBmp
+  readBmp: readBmp,
+  readBmp24: readBmp24
 };
