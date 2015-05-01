@@ -38,10 +38,18 @@ function readImgWH (filename) {
   return imgW + 'x' + imgH;
 }
 
-readImgWH(img2);
+function readImgOffSet (filename) {
+  var file = fs.readFileSync(filename);
+  var off = file.readUInt32LE(10).toString(10);
+  console.log('off: ' + off);
+}
+
+readImgOffSet(img);
+
 
 module.exports = {
   readBmp: readBmp,
   readSize: readSize,
-  readImgWH: readImgWH
+  readImgWH: readImgWH,
+  readImgOffSet: readImgOffSet
 };
