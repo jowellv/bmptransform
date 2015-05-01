@@ -20,15 +20,19 @@ function readBmp (filename) {
   console.log("test: "  + file.readUInt32LE(54 + 4*28).toString(16));
   console.log("test: "  + file.readUInt32LE(54 + 4*15).toString(16));
 
-
   console.log("bpp: " + bmpFile.bpp);
+
   var pixelStart = +file.readUInt32LE(10);
+
   console.log("pixelStart : " + pixelStart);
   console.log("fileLength: " + file.length);
   console.log("width: " + bmpFile.width);
   console.log("height: " + bmpFile.height);
 
-  bmpFile.px1 = file.readUInt8(pixelStart+13);
+  bmpFile.px1 = file.readUInt8(pixelStart+8).toString(16);
+  bmpFile.px2 = file.readUInt8(pixelStart+8+1).toString(16);
+  bmpFile.px3 = file.readUInt8(pixelStart+8+2).toString(16);
+
   console.log('pixstart: ' + pixelStart);
   console.log('colorIndex: ' + bmpFile.px1);
   // bmpFile.colorTable = [];
