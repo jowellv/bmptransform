@@ -48,25 +48,40 @@ function readBmp24 (filename) {
   var pixelStart = +file.readUInt32LE(10);
 
   // console.log("bpp: " + bmpFile.bpp);
-  console.log("pixelStart : " + pixelStart);
+  // console.log("pixelStart : " + pixelStart);
   // console.log("fileLength: " + file.length);
   // console.log("width: " + bmpFile.width);
   // console.log("height: " + bmpFile.height);
-  console.log('pixelLength : ' + bmpFile.pixelLength);
+  // console.log('pixelLength : ' + bmpFile.pixelLength);
+  // console.log('file length: ' + file.length);
 
-  //Access beyond buffer error, can't save 10000 pixels over 30000 bits
   bmpFile.pixels = [];
-  for( var i = 0 ; i <= 10000 ; i++) {
+  for( var i = 0 ; i < 10000 ; i++) {
     bmpFile.pixels.push(file.readUInt8(54 + i * 3));
   }
 
-  console.log('pix1000 : ' + bmpFile.pixels[1000]);
-  console.log('pixels length: ' + bmpFile.pixels.length);
+  // console.log('pix# : ' + bmpFile.pixels[9998]);
+  // console.log('pixels length: ' + bmpFile.pixels.length);
   return bmpFile;
 }
 
 function transformBmp24 (fileObject) {
+  fileObject.pixels.forEach(function(pixel, i, arr) {
+    arr[i] = 256-pixel;
+  });
+  return fileObject;
+}
 
+function writeBmp24 (fileObject, filename) {
+  var file = fs.readFileSync(filename);
+  var pixelStart = +file.readUInt32LE(10);
+
+  fileObject.pixels.forEach(function(pixel, i, arr) {
+    file.writeUInt32LE(pixel, pixelStart + (i * 3) - 3); // -1=red, -2=grn, -3=blu
+  });
+  fs.writeFileSync('newbmp24.bmp', file);
+  var outFile = fs.readFileSync('./newbmp24.bmp');
+  return outFile.readUInt16BE(0).toString(16);
 }
 
 function transformBmp (fileObject) {
@@ -93,5 +108,7 @@ module.exports = {
   readBmp: readBmp,
   readBmp24: readBmp24,
   transformBmp: transformBmp,
-  writeBmp: writeBmp
+  transformBmp24: transformBmp24,
+  writeBmp: writeBmp,
+  writeBmp24: writeBmp24
 };

@@ -41,6 +41,9 @@ describe('read bitmaps', function() {
     // it('read picture bits per pixel of 24', function() {
     //   expect(transform.readBmp('./non-palette-bitmap.bmp').bpp).to.eql(24);
     // });
+    it('writes the file by checking the first bytes of the new file', function() {
+      expect(transform.writeBmp24(transform.transformBmp24(transform.readBmp24('./non-palette-bitmap.bmp')),'./non-palette-bitmap.bmp')).to.eql('424d'); //
+    });
   });
 
 });
