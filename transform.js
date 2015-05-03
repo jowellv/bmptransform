@@ -87,8 +87,8 @@ function writeBmp24 (fileObject, filename) {
 function transformBmp (fileObject) {
   fileObject.colorPal.forEach(function(colorRow, i, arr) {
     arr[i] = 16777215 - colorRow;
-  });
 
+  });
   return fileObject;
 }
 
@@ -97,7 +97,7 @@ function writeBmp (fileObject, filename) {
   var startOfcp = 14 + file.readUInt32LE(14);
 
   fileObject.colorPal.forEach(function(colorRow, i, arr) {
-    file.writeUInt32LE(colorRow, startOfcp + i);
+    file.writeUInt32LE(colorRow, startOfcp + 4 * i);
   });
   fs.writeFileSync('newbmp.bmp', file);
   var outFile = fs.readFileSync('./newbmp.bmp');
