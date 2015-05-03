@@ -1,7 +1,7 @@
 {
   "name": "bmptransformer",
   "version": "0.1.0",
-  "description": "Simple bitmap transformer",
+  "description": "Simple bitmap transformer - Code Fellows assignment",
   "main": "index.js",
   "scripts": {
     "test": "./node_modules/grunt-cli/bin/grunt test"
@@ -10,7 +10,11 @@
     "type": "git",
     "url": "https://github.com/jowellv/bmptransform.git"
   },
-  "author": "jowell.villasin@gmail.com",
+  "author": "Jowell Villasin <jowell.villasin@gmail.com>",
+  "contributors": [{
+    "name": "Lamson Le",
+    "email": "lamson@gmail.com"
+    }],
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/jowellv/bmptransform/issues"
