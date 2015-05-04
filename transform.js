@@ -16,13 +16,6 @@ function readBmp (filename, transform) {
 
   var startOfcp = 14 + file.readUInt32LE(14);
   var sizeOfcp = file.readUInt32LE(46);
-  // console.log("start of pix" + file.readUInt8(pixelStart));
-  // console.log("start of cp: " + file.readUInt32LE(startOfcp + 8).toString(16));
-  // console.log(file.readUInt32LE(startOfcp + 4 * 28).toString(16));
-
-  // console.log('pixelStart: ' + pixelStart);
-  // console.log('startOfcp: ' + startOfcp);
-  // console.log('sizeOfcp: ' + sizeOfcp);
 
 
   if(bmpFile.bpp === 8) {
@@ -48,7 +41,7 @@ function transformBmp (bmpFile) {
     });
   } else {
     bmpFile.colorPal.forEach(function(colorRow, i, arr) {
-      arr[i] = 16777215 - colorRow;
+      arr[i] = 16777215 - colorRow; // === 0xFFFFFF - colorRow
     });
   }
   return bmpFile;

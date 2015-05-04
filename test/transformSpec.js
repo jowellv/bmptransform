@@ -9,7 +9,7 @@ function transformBmp (bmpFile) {
     });
   } else {
     bmpFile.colorPal.forEach(function(colorRow, i, arr) {
-      arr[i] = 16777215 - colorRow;
+      arr[i] = 16777215 - colorRow; // === 0xFFFFFF - colorRow
     });
   }
   return bmpFile;
@@ -37,26 +37,24 @@ describe('read bitmaps', function() {
   it('writes the file by checking the first bytes of the new file', function() {
     expect(transform.writeBmp(transform.readBmp('./bitmap1.bmp', transformBmp),'./bitmap1.bmp')).to.eql('424d'); //
   });
-
-  describe('transforms non palette bitmap', function() {
-    it('read file header 424d; 24bpp-file', function() {
-      expect(transform.readBmp('./non-palette-bitmap.bmp', transformBmp).header).to.eql('424d');
-    });
-    // it('read file size 30054', function() {
-    //   expect(transform.readBmp24('./non-palette-bitmap.bmp').fileSize).to.eql(30054);
-    // });
-    // it('read picture width 100px', function() {
-    //   expect(transform.readBmp24('./non-palette-bitmap.bmp').width).to.eql(100);
-    // });
-    // it('read picture height 100px', function() {
-    //   expect(transform.readBmp24('./non-palette-bitmap.bmp').height).to.eql(100);
-    // });
-    // it('read picture bits per pixel of 24', function() {
-    //   expect(transform.readBmp('./non-palette-bitmap.bmp').bpp).to.eql(24);
-    // });
-    it('writes the file by checking the first bytes of the new file', function() {
-      expect(transform.writeBmp(transform.readBmp('./non-palette-bitmap.bmp', transformBmp),'./non-palette-bitmap.bmp')).to.eql('424d'); //
-    });
+});
+describe('transforms non palette bitmap', function() {
+  it('read file header 424d; 24bpp-file', function() {
+    expect(transform.readBmp('./non-palette-bitmap.bmp', transformBmp).header).to.eql('424d');
   });
-
+  // it('read file size 30054', function() {
+  //   expect(transform.readBmp24('./non-palette-bitmap.bmp').fileSize).to.eql(30054);
+  // });
+  // it('read picture width 100px', function() {
+  //   expect(transform.readBmp24('./non-palette-bitmap.bmp').width).to.eql(100);
+  // });
+  // it('read picture height 100px', function() {
+  //   expect(transform.readBmp24('./non-palette-bitmap.bmp').height).to.eql(100);
+  // });
+  // it('read picture bits per pixel of 24', function() {
+  //   expect(transform.readBmp('./non-palette-bitmap.bmp').bpp).to.eql(24);
+  // });
+  it('writes the file by checking the first bytes of the new file', function() {
+    expect(transform.writeBmp(transform.readBmp('./non-palette-bitmap.bmp', transformBmp),'./non-palette-bitmap.bmp')).to.eql('424d'); //
+  });
 });
