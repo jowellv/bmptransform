@@ -2,10 +2,9 @@
 
 var fs = require('fs');
 
-function readBmp (filename) {
+function readBmp (filename, transform) {
   var file = fs.readFileSync(filename);
   var bmpFile = {};
-
 
   // header is 14 bytes long
   bmpFile.header = file.readUInt16BE(0).toString(16);
@@ -25,90 +24,63 @@ function readBmp (filename) {
   // console.log('startOfcp: ' + startOfcp);
   // console.log('sizeOfcp: ' + sizeOfcp);
 
-  bmpFile.colorPal = [];
-  for(var i = 0; i < sizeOfcp; i++) {
-    bmpFile.colorPal.push(file.readUInt32LE(startOfcp + 4 * i));
-  }
 
+  if(bmpFile.bpp === 8) {
+    bmpFile.colorPal = [];
+    for(var i = 0; i < sizeOfcp; i++) {
+      bmpFile.colorPal.push(file.readUInt32LE(startOfcp + 4 * i)); //color table index is 4 bytes (A,R,G,B)
+    }
+  } else {  // bpp = 24; process non-palette bmp file
+    bmpFile.pixelLength = file.readUInt32LE(34);
+    bmpFile.pixels = [];
+    for( var j = 0 ; j < bmpFile.pixelLength / 3; j++) {
+      bmpFile.pixels.push(file.readUInt8(54 + j * 3));
+    }
+  }
+  return transform(bmpFile);
+}
+
+
+function transformBmp (bmpFile) {
+  if(bmpFile.pixels) {
+    bmpFile.pixels.forEach(function(pixel, i, arr) {
+      arr[i] = 256-pixel;
+    });
+  } else {
+    bmpFile.colorPal.forEach(function(colorRow, i, arr) {
+      arr[i] = 16777215 - colorRow;
+    });
+  }
   return bmpFile;
 }
 
 
-function readBmp24 (filename) {
+function writeBmp (bmpFile, filename) {
   var file = fs.readFileSync(filename);
-  var bmpFile = {};
 
-  bmpFile.header = file.readUInt16BE(0).toString(16);
-  bmpFile.fileSize = file.readUInt32LE(2);
-  bmpFile.width = file.readUInt32LE(18);
-  bmpFile.height = file.readUInt32LE(22);
-  bmpFile.bpp = file.readUInt32LE(28);
-  bmpFile.pixelLength = file.readUInt32LE(34);
+  if(bmpFile.bpp === 8) { //process 8bpp file
+    var startOfcp = 14 + file.readUInt32LE(14);
 
-  var pixelStart = +file.readUInt32LE(10);
+    bmpFile.colorPal.forEach(function(colorRow, i, arr) {
+      file.writeUInt32LE(colorRow, startOfcp + 4 * i);
+    });
+    fs.writeFileSync('newbmp.bmp', file);
+    var outFile = fs.readFileSync('./newbmp.bmp');
+    return outFile.readUInt16BE(0).toString(16);
+  } else { // process non-pallette file
+    var pixelStart = +file.readUInt32LE(10);
 
-  // console.log("bpp: " + bmpFile.bpp);
-  // console.log("pixelStart : " + pixelStart);
-  // console.log("fileLength: " + file.length);
-  // console.log("width: " + bmpFile.width);
-  // console.log("height: " + bmpFile.height);
-  // console.log('pixelLength : ' + bmpFile.pixelLength);
-  // console.log('file length: ' + file.length);
-
-  bmpFile.pixels = [];
-  for( var i = 0 ; i < 10000 ; i++) {
-    bmpFile.pixels.push(file.readUInt8(54 + i * 3));
+    bmpFile.pixels.forEach(function(pixel, i, arr) {
+      file.writeUInt32LE(pixel, pixelStart + (i * 3) - 2); // -1=red, -2=grn, -3=blu
+    });
+    fs.writeFileSync('newbmp24.bmp', file);
+    var out24File = fs.readFileSync('./newbmp24.bmp');
+    return out24File.readUInt16BE(0).toString(16);
   }
-
-  // console.log('pix# : ' + bmpFile.pixels[9998]);
-  // console.log('pixels length: ' + bmpFile.pixels.length);
-  return bmpFile;
-}
-
-function transformBmp24 (fileObject) {
-  fileObject.pixels.forEach(function(pixel, i, arr) {
-    arr[i] = 256-pixel;
-  });
-  return fileObject;
-}
-
-function writeBmp24 (fileObject, filename) {
-  var file = fs.readFileSync(filename);
-  var pixelStart = +file.readUInt32LE(10);
-
-  fileObject.pixels.forEach(function(pixel, i, arr) {
-    file.writeUInt32LE(pixel, pixelStart + (i * 3) - 3); // -1=red, -2=grn, -3=blu
-  });
-  fs.writeFileSync('newbmp24.bmp', file);
-  var outFile = fs.readFileSync('./newbmp24.bmp');
-  return outFile.readUInt16BE(0).toString(16);
-}
-
-function transformBmp (fileObject) {
-  fileObject.colorPal.forEach(function(colorRow, i, arr) {
-    arr[i] = 16777215 - colorRow;
-
-  });
-  return fileObject;
-}
-
-function writeBmp (fileObject, filename) {
-  var file = fs.readFileSync(filename);
-  var startOfcp = 14 + file.readUInt32LE(14);
-
-  fileObject.colorPal.forEach(function(colorRow, i, arr) {
-    file.writeUInt32LE(colorRow, startOfcp + 4 * i);
-  });
-  fs.writeFileSync('newbmp.bmp', file);
-  var outFile = fs.readFileSync('./newbmp.bmp');
-  return outFile.readUInt16BE(0).toString(16);
 }
 
 module.exports = {
   readBmp: readBmp,
-  readBmp24: readBmp24,
   transformBmp: transformBmp,
-  transformBmp24: transformBmp24,
-  writeBmp: writeBmp,
-  writeBmp24: writeBmp24
+  writeBmp: writeBmp
 };
